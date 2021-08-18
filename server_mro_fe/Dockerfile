@@ -1,0 +1,50 @@
+# https://mherman.org/blog/dockerizing-a-react-app/
+# https://dzone.com/articles/how-to-dockerize-reactjs-app
+
+## Part 1 - Build the Production React Image
+
+# Specify the starting point image from docker-hub.  In this case its a docker image with node.js preinstalled on alpine linux.
+FROM node:latest as build
+
+# Injest the build time variables defined in the heroku.yml and assign them to the appropriate environment variables
+ARG BASE_URL
+ARG OMAPI_PUBLIC_KEY
+ARG SQUARE_APP_ID
+ARG SQUARE_LOC_ID
+
+ENV REACT_APP_BASE_URL=${BASE_URL}
+ENV REACT_APP_OMAPI_PUBLIC_KEY=${OMAPI_PUBLIC_KEY}
+ENV REACT_APP_SQUARE_APP_ID=${SQUARE_APP_ID}
+ENV REACT_APP_SQUARE_LOC_ID=${SQUARE_LOC_ID}
+
+# Set Working Directory for the Container - Assuming the node environment comes with an /app folder based on other guides
+WORKDIR /app
+
+# Copy across the dependency description
+COPY package.json /app
+
+# Will execute npm install in /app due to WORKDIR selection
+RUN npm install --legacy-peer-deps 
+
+# Copy Build Files to Container
+COPY . /app
+
+# Run React Build
+RUN npm run build 
+
+
+
+## Part 2 - Deploy with nginx
+
+# Specify the starting point image from docker-hub.  In this case its a docker image with nginx preinstalled on alpine linux to serve up the compiled React Application.
+FROM nginx:latest
+
+# Copy the built application to the appropriate location in the nginx Docker Container
+COPY --from=build /app/build /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Command to edit the nginx configuration file with the assigned port.  Heroku automatically creates the PORT environment variable with a random value.
+CMD sed -i -e 's/$PORT/'"$PORT"'/g' /etc/nginx/nginx.conf && nginx -g 'daemon off;'
+
+## Additional Details -> Project Notes:Docker (Not shared in GIT repository) ##
