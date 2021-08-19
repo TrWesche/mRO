@@ -1,6 +1,7 @@
-# https://github.com/arangodb/arangodb-docker/issues/22
-
 # Specify the starting point image from docker-hub.  In this case its a docker image with node.js preinstalled on alpine linux.
+
+# docker build -t influxdb/mro:2.0 .
+
 FROM influxdb:latest
 
 # CMD arangod --server.endpoint tcp://0.0.0.0:$PORT \
@@ -8,17 +9,10 @@ FROM influxdb:latest
 #   --database.password $ARANGO_ROOT_PASSWORD
 
 CMD influxdb \
-  -p 8086:8086 \
-  -v influxdb:/root/influxdb/data \
-  -v influxdb2:/root/influxdb2/data \
-  -v influxdb2-config:/etc/influxdb2 \
-  -v $PWD/influxdb.conf:/root/influxdb/influxdb.conf \
+  -p $PORT:8086 \
   -e DOCKER_INFLUXDB_INIT_MODE=setup \
-  -e DOCKER_INFLUXDB_INIT_PASSWORD=my-password \
-  -e DOCKER_INFLUXDB_INIT_ORG=my-org \
-  -e DOCKER_INFLUXDB_INIT_BUCKET=my-bucket \
-  -e DOCKER_INFLUXDB_INIT_RETENTION=1w \
-  -e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token \
-  -e DOCKER_INFLUXDB_CONFIG_PATH=/root/influxdb2/config.toml \
-  -e DOCKER_INFLUXDB_BOLT_PATH=/root/influxdb2/influxdb.bolt \
-  -e DOCKER_INFLUXDB_ENGINE_PATH=/root/influxdb2/engine
+  -e DOCKER_INFLUXDB_INIT_USERNAME=$INITIAL_SU_USERNAME \
+  -e DOCKER_INFLUXDB_INIT_PASSWORD=$INITIAL_SU_PASSWORD \
+  -e DOCKER_INFLUXDB_INIT_ORG=$INITIAL_ORG_NAME \
+  -e DOCKER_INFLUXDB_INIT_BUCKET=$INITIAL_BUCKET_NAME \
+  -e DOCKER_INFLUXDB_INIT_RETENTION=$INITIAL_BUCKET_DATA_RET_DURATION \
