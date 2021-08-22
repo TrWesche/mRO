@@ -1,42 +1,58 @@
 const mqtt = require('mqtt');
+const options={
+    clientId:"mqttjs01",
+    username:"rabbitmq",
+    password:"rabbitmq",
+    clean:true,
+    servers: [
+        { host: 'localhost', port: 8882 }
+    ],
+    protocolId: 'MQIsdp',
+    protocolVersion: 3,
+};
+
 let count = 0;
-const client  = mqtt.connect("mqtt://192.168.1.157",{clientId:"mqttjs01"});
-console.log("connected flag  " + client.connected);
+// const client  = mqtt.connect("mqtt://127.0.0.1:8882",options);
+const client  = mqtt.connect(opts=options);
+console.log("connected flag " + client.connected);
 
 //handle incoming messages
 client.on('message',function(topic, message, packet){
-	console.log("message is "+ message);
-	console.log("topic is "+ topic);
+	// console.log("message is "+ message);
+	// console.log("topic is "+ topic);
 });
 
 
 client.on("connect",function(){	
     console.log("connected  "+ client.connected);
-})
+});
 
 //handle errors
-client.on("error",function(error){
+client.on("error", function(error){
     console.log("Can't connect" + error);
-process.exit(1)});
+    process.exit(1)}
+);
 
 //publish
 function publish(topic,msg,options){
-    console.log("publishing",msg);
+    const message = `${msg} ${count}`
+    // console.log("publishing",message);
 
     if (client.connected == true){
-	
-    client.publish(topic,msg,options);
-
+        client.publish(topic,message,options);
     }
     count+=1;
-if (count==2) //ens script
-	clearTimeout(timer_id); //stop timer
-	client.end();	
+    
+    if (count>=500) {//end script
+	    clearTimeout(timer_id); //stop timer
+	    client.end();
+        process.exit(0);
+    };
 }
 
 //////////////
 
-var options={
+var pubOptions={
     retain:true,
     qos:1
 };
@@ -52,7 +68,5 @@ client.subscribe(topic_list,{qos:1}); //topic list
 client.subscribe(topic_o); //object
 
 var timer_id=setInterval(function(){
-    publish(topic,message,options);
-},5000);
-//notice this is printed even before we connect
-console.log("end of script");
+    publish(topic,message,pubOptions);
+},50);
