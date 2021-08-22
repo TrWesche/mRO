@@ -1,7 +1,7 @@
 version: '3.1'
 
 services:
-  server-mqtt:
+  server-rabbitmq-mro:
     image: rabbitmq-mro
     # image: rabbitmq:management
     container_name: server-rabbitmq-mro
@@ -21,7 +21,13 @@ services:
     #   - rabbitmq-plugins enable rabbitmq_web_mqtt
     networks:
       - webnet
+    volumes:
+      - rabbitmq-mro-vol:/var/lib/rabbitmq/
 
 networks:
   webnet:
       driver: bridge
+
+volumes:
+  rabbitmq-mro-vol:
+    driver: local
