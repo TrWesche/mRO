@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+  server-mqtt:
+    image: eclipse-mosquitto
+    container_name: server-mosquitto-mro
+    restart: always
+    ports:
+      - "8883:1883"
+      - "9001:9001"
+    env_file: 
+      - mqtt.env
+    volumes:
+      - ./mosquitto:/mosquitto/config
+    networks:
+      - webnet
+
+networks:
+  webnet:
+      driver: bridge

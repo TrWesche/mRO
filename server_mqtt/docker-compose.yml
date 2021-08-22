@@ -2,19 +2,26 @@ version: '3.1'
 
 services:
   server-mqtt:
-    image: eclipse-mosquitto
-    container_name: server-mosquitto-mro
+    image: rabbitmq-mro
+    # image: rabbitmq:management
+    container_name: server-rabbitmq-mro
+    hostname: robo-rabbit
     restart: always
     ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "8882:8882"
       - "8883:8883"
-      - "9001:9001"
+      - "15675:15675"
     env_file: 
-      - mqtt.env
-    volumes:
-      - ./mosquitto:/mosquitto/config
+      - rabbitmq.env
+    # command: 
+    #   - rabbitmq-plugins enable rabbitmq_management
+    #   - rabbitmq-plugins enable rabbitmq_mqtt
+    #   - rabbitmq-plugins enable rabbitmq_web_mqtt
     networks:
       - webnet
 
 networks:
   webnet:
-      
+      driver: bridge

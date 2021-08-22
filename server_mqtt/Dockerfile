@@ -1,12 +1,8 @@
-# docker run --name mosquitto eclipse-mosquitto
-# docker cp mosquitto:/mosquitto/config .
-
-# docker run -it -p 1883:1883 -p 9001:9001 -v $PWD/mosquitto.conf:/mosquitto/config/mosquitto.conf eclipse-mosquitto
+#docker build -f Dockerfile -t rabbitmq-mro .
 
 # Specify the starting point image from docker-hub.  In this case its a docker image with node.js preinstalled on alpine linux.
-FROM eclipse-mosquitto:latest
+FROM rabbitmq:management
 
-CMD eclipse-mosquitto \
-  -p 1883:1883 \
-  -p 9001:9001 \
-  -v mosquitto.conf:/mosquitto/config/mosquitto.conf
+COPY rabbitmq.conf ./etc/rabbitmq/rabbitmq.conf
+COPY advanced.config ./etc/rabbitmq/advanced.config
+COPY enabled_plugins ./etc/rabbitmq/enabled_plugins

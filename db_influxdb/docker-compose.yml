@@ -24,6 +24,8 @@ services:
       - influx-net
     volumes:
       - $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on: 
+      - db-influxdb-mro
 
 networks:
   influx-net:
