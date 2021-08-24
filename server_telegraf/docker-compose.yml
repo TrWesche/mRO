@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+  svc-telegraf-mro:
+    image: telegraf
+    container_name: svc-telegraf-mro
+    restart: always
+    # links:
+    #   - db-influx-mro
+    # ports:
+    #   - 8094:8094
+    network_mode: "host"
+    env_file: 
+      - telegraf.env
+    volumes:
+      - $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro

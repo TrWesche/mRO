@@ -5,10 +5,10 @@ const options={
     password:"rabbitmq",
     clean:true,
     servers: [
-        { host: 'localhost', port: 8882 }
+        { host: '127.0.0.1', port: 8882 }
     ],
     protocolId: 'MQIsdp',
-    protocolVersion: 3,
+    protocolVersion: 3
 };
 
 let count = 0;
@@ -20,6 +20,7 @@ console.log("connected flag " + client.connected);
 client.on('message',function(topic, message, packet){
 	// console.log("message is "+ message);
 	// console.log("topic is "+ topic);
+    // console.log(packet)
 });
 
 
@@ -35,15 +36,17 @@ client.on("error", function(error){
 
 //publish
 function publish(topic,msg,options){
-    const message = `${msg} ${count}`
-    // console.log("publishing",message);
+    // const message = `${msg} ${count}`
+
+    const payload = JSON.stringify(msg);
+    console.log("publishing",payload);
 
     if (client.connected == true){
-        client.publish(topic,message,options);
+        client.publish(topic,payload,options);
     }
     count+=1;
     
-    if (count>=500) {//end script
+    if (count>=30) {//end script
 	    clearTimeout(timer_id); //stop timer
 	    client.end();
         process.exit(0);
@@ -57,16 +60,20 @@ var pubOptions={
     qos:1
 };
 
-var topic="testtopic";
-var message="test message";
-var topic_list=["topic2","topic3","topic4"];
-var topic_o={"topic22":0,"topic33":1,"topic44":1};
-console.log("subscribing to topics");
+var topic="testtopic/messagecount";
 
-client.subscribe(topic,{qos:1}); //single topic
-client.subscribe(topic_list,{qos:1}); //topic list
-client.subscribe(topic_o); //object
+// var topic_list=["topic2","topic3","topic4"];
+// var topic_o={"topic22":0,"topic33":1,"topic44":1};
+// console.log("subscribing to topics");
+
+// client.subscribe(topic,{qos:1}); //single topic
+// client.subscribe(topic_list,{qos:1}); //topic list
+// client.subscribe(topic_o); //object
 
 var timer_id=setInterval(function(){
-    publish(topic,message,pubOptions);
-},50);
+    const message={
+        descriptor: "test message",
+        value: Math.random()*150
+    };
+    publish(topic, message, pubOptions);
+},1000);

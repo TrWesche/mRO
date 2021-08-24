@@ -1,0 +1,41 @@
+version: '3.1'
+
+services:
+  db-influxdb-mro:
+    image: influxdb
+    container_name: db-influxdb-mro
+    restart: always
+    ports:
+      - 8086:8086
+    env_file: 
+      - influxdb.env
+    networks: 
+      - influx-net
+    volumes:
+      - influxdb-mro-vol:/var/lib/influxdb
+
+  svc-telegraf-mro:
+    image: telegraf
+    container_name: svc-telegraf-mro
+    restart: always
+    links:
+      - db-influx-mro
+    ports:
+      - 8094:8094
+    env_file: 
+      - telegraf.env
+    networks: 
+      - influx-net
+    volumes:
+      - $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on: 
+      - db-influxdb-mro
+
+networks:
+  influx-net:
+    driver: bridge
+
+volumes:
+  influxdb-mro-vol:
+    driver: local
+

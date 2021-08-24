@@ -3,85 +3,114 @@ version: '3.1'
 services:
     db-influxdb-mro:
         image: influxdb
+        container_name: db-influxdb-mro
         restart: always
         ports:
             - 8086:8086
-        environment:
-            DOCKER_INFLUXDB_INIT_MODE: setup
-            DOCKER_INFLUXDB_INIT_USERNAME: iflxuser
-            DOCKER_INFLUXDB_INIT_PASSWORD: iflxpassword
-            DOCKER_INFLUXDB_INIT_ORG: my-org
-            DOCKER_INFLUXDB_INIT_BUCKET: my-bucket
-            DOCKER_INFLUXDB_INIT_RETENTION: 1w
-            DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: my-super-secret-auth-token
-        networks:
-            - backend
+        env_file: 
+            - influxdb.env
+        networks: 
+            - web
         volumes:
             - influxdb-mro-vol:/var/lib/influxdb
 
-    db-postgresql-mro:
-        image: postgres
+    svc-telegraf-mro:
+        image: telegraf
+        container_name: svc-telegraf-mro
+        restart: always
+        env_file: 
+            - telegraf.env
+        networks: 
+            - web
+        volumes:
+            - $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+        depends_on: 
+            - db-influxdb-mro
+            - server-rabbitmq-mro
+
+    server-rabbitmq-mro:
+        image: rabbitmq-mro
+        container_name: server-rabbitmq-mro
+        hostname: robo-rabbit
         restart: always
         ports:
-            - 3000:3000
-        environment:
-            POSTGRES_USER: pguser
-            POSTGRES_PASSWORD: pgpassword
-        networks:
-            - backend
-        volumes:
-            - postgresql-mro-vol:/var/lib/postgresql/data
-
-    adminer:
-        image: adminer
-        restart: always
-        ports: 
-            - 8080:8080
+            - "5672:5672"
+            - "15672:15672"
+            - "8882:8882"
+            - "8883:8883"
+            - "15675:15675"
+        env_file: 
+            - rabbitmq.env
         networks:
             - web
-            - backend
+        volumes:
+            - rabbitmq-mro-vol:/var/lib/rabbitmq/
 
-    be-node-express-mro:
-        image: be-node-express-mro
-        restart: always
-        ports:
-            - 4000:4000
+    # db-postgresql-mro:
+    #     image: postgres
+    #     restart: always
+    #     ports:
+    #         - 3000:3000
+    #     environment:
+    #         POSTGRES_USER: pguser
+    #         POSTGRES_PASSWORD: pgpassword
+    #     networks:
+    #         - backend
+    #     volumes:
+    #         - postgresql-mro-vol:/var/lib/postgresql/data
+
+    # adminer:
+    #     image: adminer
+    #     restart: always
+    #     ports: 
+    #         - 8080:8080
+    #     networks:
+    #         - web
+    #         - backend
+
+    # be-node-express-mro:
+    #     image: be-node-express-mro
+    #     restart: always
+    #     ports:
+    #         - 4000:4000
         # environment:
         #     - DATABASE_URL=postgres://postgres:ompassword@om-pgdb-core:3000/opus-core
         #     - COOKIE_SIG=adf269e1a5c8a89b26a0194f183c0b26
         #     - PORT=5000
         #     - NODE_ENV=dev
         #     - ORIGIN_FRONTEND=http://opusmarket.docker.localhost/
-        networks:
-            - web
-            - backend
-        depends_on:
-            - "opusmarket-postgres-db"
+        # networks:
+        #     - web
+        #     - backend
+        # depends_on:
+        #     - "opusmarket-postgres-db"
 
-    fe-webapp-mro:
-        image: fe-webapp-mro
-        ports:
-            - 80:80
-        networks:
-            - web
-            - backend
+    # fe-webapp-mro:
+    #     image: fe-webapp-mro
+    #     ports:
+    #         - 80:80
+    #     networks:
+    #         - web
+    #         - backend
 
-    fe-grafana-mro:
-        image: fr-grafana-mro
-        ports:
-            - 120:3000
-        networks:
-            - web
-            - backend
+    # fe-grafana-mro:
+    #     image: fr-grafana-mro
+    #     ports:
+    #         - 120:3000
+    #     networks:
+    #         - web
+    #         - backend
 
 networks:
   web:
     driver: bridge
-  backend:
-    driver: bridge
+#   backend:
+#     driver: bridge
 
 volumes:
     influxdb-mro-vol:
         driver: local
-    postgresql-mro-vol:
+    # postgresql-mro-vol:
+    #     driver: local
+    rabbitmq-mro-vol:
         driver: local

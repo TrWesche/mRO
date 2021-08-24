@@ -9,27 +9,8 @@ services:
       - 8086:8086
     env_file: 
       - influxdb.env
-    networks: 
-      - influx-net
     volumes:
       - influxdb-mro-vol:/var/lib/influxdb
-
-  svc-telegraf-mro:
-    image: telegraf
-    container_name: svc-telegraf-mro
-    restart: always
-    env_file: 
-      - telegraf.env
-    networks: 
-      - influx-net
-    volumes:
-      - $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-    depends_on: 
-      - db-influxdb-mro
-
-networks:
-  influx-net:
-    driver: bridge
 
 volumes:
   influxdb-mro-vol:
