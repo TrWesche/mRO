@@ -1,7 +1,8 @@
 import express from "express";
+import { PORT } from "./configEnv";
+import { dbMain } from "./dbConnect";
 
 const app = express();
-const PORT = 8000;
 
 app.get('/', (req, res) => res.send('Express + TypeScript Server is running'));
 app.listen(PORT, () => {
