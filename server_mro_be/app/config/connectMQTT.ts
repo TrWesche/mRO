@@ -1,20 +1,29 @@
 import MQTT from "async-mqtt";
 import { ADDR_MQTT_BROKER1 } from "../../configEnv";
 
-export const mqttPublish = async (logging: boolean = false, topic: string, message: string | Buffer) => {
+export const mqttConnectClient = async (logging: boolean = false) => {
 	try {
 		// 1---- Check if Broker Address has been defined, if not throw an error and exit.
 		if (ADDR_MQTT_BROKER1 === undefined) {
 			throw new Error("MQTT Broker Address not defined, please provide an address to initiate connection.");
 		}
-	
+
 		// 2---- Attempt to initiate a connection to the MQTT broker.
 		if (logging) {
 			console.log("Initializing connection to MQTT broker.");
 		}
-		const client = MQTT.connect(ADDR_MQTT_BROKER1);
-	
-		// 3---- Initiate Transaction with the MQTT Broker
+		const client = await MQTT.connect(ADDR_MQTT_BROKER1);
+		return client;
+	} catch (error) {
+		// Do something about it!
+		console.log(error.stack);
+		process.exit();
+	}
+}
+
+export const mqttPublish = async (client: MQTT.AsyncClient, topic: string, message: string | Buffer, logging: boolean = false) => {
+	try {
+		// 1---- Initiate Transaction with the MQTT Broker
 		if (logging) {
 			console.log("Transaction Started");
 			console.log(`Topic = ${topic}`);
