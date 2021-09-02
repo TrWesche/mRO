@@ -4,7 +4,7 @@
   "description": "Private & Public APIs for control & configuration of mobile robots.",
   "main": "app.ts",
   "scripts": {
-    "start": "nodemon app.ts",
+    "start": "nodemon --exec npx ts-node app.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --project ./"
   },
@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@databases/pg": "^5.1.0",
+    "async-mqtt": "^2.6.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1"
   }
