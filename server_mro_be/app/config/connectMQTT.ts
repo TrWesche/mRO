@@ -1,5 +1,8 @@
+// TODO:: This should eventually handle multiple servers
 import MQTT from "async-mqtt";
-import { ADDR_MQTT_BROKER1 } from "../../configEnv";
+import {
+    ADDR_MQTT_BROKER1
+} from "../../configEnv";
 
 export const mqttConnectClient = async (logging: boolean = false) => {
 	try {
@@ -15,7 +18,6 @@ export const mqttConnectClient = async (logging: boolean = false) => {
 		const client = await MQTT.connect(ADDR_MQTT_BROKER1);
 		return client;
 	} catch (error) {
-		// Do something about it!
 		console.log(error.stack);
 		process.exit();
 	}

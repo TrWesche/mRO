@@ -1,9 +1,9 @@
-import { db } from "../coreDB";
+import { coreDB } from './_dbConnect';
 import { sql } from '@databases/pg'
 
 export async function begin_transaction() {
     try {
-        const result = await db.query(sql`BEGIN`);
+        const result = await coreDB.query(sql`BEGIN`);
 
         return result;
     } catch (error) {
@@ -14,7 +14,7 @@ export async function begin_transaction() {
 
 export async function commit_transaction() {
     try {
-        const result = await db.query(sql`COMMIT`);
+        const result = await coreDB.query(sql`COMMIT`);
 
         return result;
     } catch (error) {
@@ -25,7 +25,7 @@ export async function commit_transaction() {
 
 export async function rollback_transaction() {
     try {
-        const result = await db.query(sql`ROLLBACK`);
+        const result = await coreDB.query(sql`ROLLBACK`);
 
         return result;
     } catch (error) {

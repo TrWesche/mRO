@@ -1,10 +1,7 @@
 import express from "express";
 import { PORT } from "./configEnv";
-import { mqttConnectClient } from "./app/config/connectMQTT";
 
-const app = express();
-
-const mqttClient = mqttConnectClient(true);
+export const app = express();
 
 app.get('/', (req, res) => res.send('Express + TypeScript Server is running'));
 app.listen(PORT, () => {
