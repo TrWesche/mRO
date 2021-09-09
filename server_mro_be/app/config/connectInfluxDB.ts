@@ -2,7 +2,7 @@
 // TODO::  This should eventually handle multiple servers
 import { InfluxDB } from "influx";
 
-export const influxDatabaseConnect = async (connectionString: string | undefined, logging: boolean = false) => {
+export const influxDatabaseConnect = (connectionString: string | undefined, logging: boolean = false) => {
     try {
         // 1---- Check if Broker Address has been defined, if not throw an error and exit.
 		if (connectionString === undefined) {
@@ -14,10 +14,10 @@ export const influxDatabaseConnect = async (connectionString: string | undefined
 			console.log("Initializing connection to Influx database.");
 		}
         // 2---- Attempt to create a connection to the Influx Database.
-        const db = await new InfluxDB(connectionString);
+        const db = new InfluxDB(connectionString);
         return db;
     } catch (error) {
-        console.log(error.stack);
+        console.log(error);
 		process.exit();
     }
 }

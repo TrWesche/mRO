@@ -18,7 +18,7 @@ export const mqttConnectClient = async (logging: boolean = false) => {
 		const client = await MQTT.connect(ADDR_MQTT_BROKER1);
 		return client;
 	} catch (error) {
-		console.log(error.stack);
+		console.log(error);
 		process.exit();
 	}
 }
@@ -41,7 +41,7 @@ export const mqttPublish = async (client: MQTT.AsyncClient, topic: string, messa
 		}
 	} catch (error) {
 		// Do something about it!
-		console.log(error.stack);
+		console.log(error);
 		process.exit();
 	}
 }
